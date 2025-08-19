@@ -9,7 +9,7 @@ const schema = a.schema({
       transliteration: a.string().required(),
       definition: a.string().required(),
       usage: a.string(),
-      references: a.list(a.string()),
+      references: a.string().array(),
       content: a.string().required(),
     })
     .authorization((allow) => [allow.guest()]),
@@ -22,7 +22,7 @@ const schema = a.schema({
       translation: a.string().required(),
       category: a.string(),
       content: a.string().required(),
-      strongs: a.list(a.string()),
+      strongs: a.string().array(),
     })
     .authorization((allow) => [allow.guest()]),
 
@@ -31,8 +31,8 @@ const schema = a.schema({
       title: a.string().required(),
       content: a.string().required(),
       category: a.string(),
-      tags: a.list(a.string()),
-      references: a.list(a.string()),
+      tags: a.string().array(),
+      references: a.string().array(),
     })
     .authorization((allow) => [allow.guest()]),
 });

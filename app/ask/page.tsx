@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './ask.module.css';
 
@@ -119,38 +119,14 @@ export default function AskPage() {
     }
   };
 
-  const clearChat = () => {
+  const clearChat = useCallback(() => {
     if (messages.length > 0 && window.confirm('Are you sure you want to clear the entire conversation? This action cannot be undone.')) {
       setMessages([]);
       localStorage.removeItem('agents-of-faith-conversation');
     }
-  };
+  }, [messages]);
 
-  const exportConversation = () => {
-    const conversationText = messages.map(msg => 
-      `${msg.role === 'user' ? 'You' : 'Assistant'}: ${msg.content}`
-    ).join('\n\n');
-    
-    const blob = new Blob([conversationText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    
-    // Create a better filename with conversation title
-    const title = getConversationTitle().replace(/[^a-zA-Z0-9\s]/g, '').substring(0, 30);
-    const date = new Date().toISOString().split('T')[0];
-    const filename = title ? `${title}-${date}.txt` : `theological-conversation-${date}.txt`;
-    
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    // Show success message
-    setShowExportSuccess(true);
-    setTimeout(() => setShowExportSuccess(false), 3000);
-  };
+
 
   const getConversationDuration = () => {
     if (messages.length < 2) return null;
@@ -210,7 +186,7 @@ export default function AskPage() {
     }
   };
 
-  const getConversationTitle = () => {
+  const getConversationTitle = useCallback(() => {
     if (messages.length === 0) return '';
     const firstUserMessage = messages.find(m => m.role === 'user');
     if (!firstUserMessage) return '';
@@ -218,7 +194,33 @@ export default function AskPage() {
     const content = firstUserMessage.content;
     if (content.length <= 50) return content;
     return content.substring(0, 50) + '...';
-  };
+  }, [messages]);
+
+  const exportConversation = useCallback(() => {
+    const conversationText = messages.map(msg => 
+      `${msg.role === 'user' ? 'You' : 'Assistant'}: ${msg.content}`
+    ).join('\n\n');
+    
+    const blob = new Blob([conversationText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    
+    // Create a better filename with conversation title
+    const title = getConversationTitle().replace(/[^a-zA-Z0-9\s]/g, '').substring(0, 30);
+    const date = new Date().toISOString().split('T')[0];
+    const filename = title ? `${title}-${date}.txt` : `theological-conversation-${date}.txt`;
+    
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // Show success message
+    setShowExportSuccess(true);
+    setTimeout(() => setShowExportSuccess(false), 3000);
+  }, [messages, getConversationTitle]);
 
   // Keyboard shortcuts
   useEffect(() => {
