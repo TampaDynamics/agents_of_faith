@@ -47,24 +47,7 @@ export default function AskPage() {
     }
   }, [messages]);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd+K (Mac) or Ctrl+K (Windows/Linux) to clear chat
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        clearChat();
-      }
-      // Cmd+E (Mac) or Ctrl+E (Windows/Linux) to export
-      if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
-        e.preventDefault();
-        exportConversation();
-      }
-    };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -171,8 +154,9 @@ export default function AskPage() {
 
   const getConversationDuration = () => {
     if (messages.length < 2) return null;
-    const start = messages[0].timestamp;
-    const end = messages[messages.length - 1].timestamp;
+    const start = messages[0]?.timestamp;
+    const end = messages[messages.length - 1]?.timestamp;
+    if (!start || !end) return null;
     const duration = end.getTime() - start.getTime();
     const minutes = Math.floor(duration / (1000 * 60));
     const hours = Math.floor(minutes / 60);
@@ -186,6 +170,7 @@ export default function AskPage() {
   const getLastActivity = () => {
     if (messages.length === 0) return null;
     const lastMessage = messages[messages.length - 1];
+    if (!lastMessage) return null;
     const now = new Date();
     const diff = now.getTime() - lastMessage.timestamp.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
@@ -220,7 +205,7 @@ export default function AskPage() {
         return `${sizeInKB} KB`;
       }
       return '0 KB';
-    } catch (error) {
+    } catch {
       return 'Unknown';
     }
   };
@@ -234,6 +219,25 @@ export default function AskPage() {
     if (content.length <= 50) return content;
     return content.substring(0, 50) + '...';
   };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd+K (Mac) or Ctrl+K (Windows/Linux) to clear chat
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        clearChat();
+      }
+      // Cmd+E (Mac) or Ctrl+E (Windows/Linux) to export
+      if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+        e.preventDefault();
+        exportConversation();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [clearChat, exportConversation]);
 
   const formatMessage = (content: string) => {
     // Simple markdown-like formatting
@@ -337,16 +341,16 @@ export default function AskPage() {
                 <h3>Welcome to Agents of Faith</h3>
                 <p>
                   Ask me any question about Scripture, theology, or Christian doctrine. 
-                  I'll provide a comprehensive answer with biblical citations, historical context, 
+                  I&apos;ll provide a comprehensive answer with biblical citations, historical context, 
                   and practical application.
                 </p>
                 <div className={styles.exampleQuestions}>
                   <h4>Example Questions:</h4>
                   <ul>
-                    <li>"What does it mean to be created in God's image?"</li>
-                    <li>"How should Christians understand the Trinity?"</li>
-                    <li>"What is the biblical view of salvation by grace?"</li>
-                    <li>"How do we interpret difficult passages in the Old Testament?"</li>
+                    <li>&ldquo;What does it mean to be created in God&apos;s image?&rdquo;</li>
+                    <li>&ldquo;How should Christians understand the Trinity?&rdquo;</li>
+                    <li>&ldquo;What is the biblical view of salvation by grace?&rdquo;</li>
+                    <li>&ldquo;How do we interpret difficult passages in the Old Testament?&rdquo;</li>
                   </ul>
                 </div>
               </div>

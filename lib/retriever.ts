@@ -63,7 +63,7 @@ export class HybridRetriever {
     const combined = new Map<string, RetrievalResult>();
     
     // Add vector results
-    vectorResults.forEach((result, index) => {
+    vectorResults.forEach((result) => {
       combined.set(result.document.id, {
         document: result.document,
         score: result.score,

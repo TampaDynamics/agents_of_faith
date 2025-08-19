@@ -14,20 +14,28 @@
     "test-api": "tsx scripts/test-api.ts"
   },
   "dependencies": {
-    "next": "15.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "openai": "^4.24.0",
-    "dotenv": "^16.0.0"
+    "aws-amplify": "^6.15.5",
+    "dotenv": "^17.2.1",
+    "next": "^15.4.7",
+    "openai": "^5.12.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "eslint": "^8.0.0",
-    "eslint-config-next": "15.0.0",
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "typescript": "^5.0.0",
+    "@aws-amplify/backend": "^1.16.1",
+    "@aws-amplify/backend-cli": "^1.8.0",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@typescript-eslint/eslint-plugin": "^8.40.0",
+    "@typescript-eslint/parser": "^8.40.0",
+    "aws-cdk-lib": "^2.204.0",
+    "constructs": "^10.4.2",
+    "esbuild": "^0.25.9",
+    "eslint": "^9.33.0",
+    "eslint-config-next": "^15.4.7",
     "prettier": "^3.0.0",
-    "tsx": "^4.0.0"
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2"
   }
 }

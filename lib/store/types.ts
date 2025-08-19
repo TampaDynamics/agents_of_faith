@@ -12,17 +12,17 @@ export interface SearchResult {
 
 export interface VectorStore {
   // Core operations
-  addDocument(document: VectorDocument): Promise<void>;
-  addDocuments(documents: VectorDocument[]): Promise<void>;
+  addDocument(_document: VectorDocument): Promise<void>;
+  addDocuments(_documents: VectorDocument[]): Promise<void>;
   
   // Search operations
-  similaritySearch(query: string, k: number): Promise<SearchResult[]>;
-  similaritySearchByVector(vector: number[], k: number): Promise<SearchResult[]>;
+  similaritySearch(_query: string, _k: number): Promise<SearchResult[]>;
+  similaritySearchByVector(_vector: number[], _k: number): Promise<SearchResult[]>;
   
   // Utility operations
-  deleteDocument(id: string): Promise<void>;
-  getDocument(id: string): Promise<VectorDocument | null>;
-  listDocuments(limit?: number, offset?: number): Promise<VectorDocument[]>;
+  deleteDocument(_id: string): Promise<void>;
+  getDocument(_id: string): Promise<VectorDocument | null>;
+  listDocuments(_limit?: number, _offset?: number): Promise<VectorDocument[]>;
   
   // Health check
   health(): Promise<boolean>;

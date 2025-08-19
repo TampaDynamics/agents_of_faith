@@ -46,7 +46,7 @@ function extractSections(content: string) {
   
   Object.entries(sectionPatterns).forEach(([key, pattern]) => {
     const match = content.match(pattern);
-    sections[key] = match ? match[1].trim() : '';
+    sections[key] = match && match[1] ? match[1].trim() : '';
   });
 
   return sections;
@@ -67,12 +67,12 @@ function extractStrongsReferences(content: string): string[] {
   return [...new Set(strongsRefs)]; // Remove duplicates
 }
 
-function validateResponse(sections: any, citations: string[]): string[] {
+function validateResponse(sections: Record<string, string>, citations: string[]): string[] {
   const issues: string[] = [];
   
   // Check if all sections are present and have content
   Object.entries(sections).forEach(([key, content]) => {
-    if (!content || content.trim().length < 10) {
+    if (!content || typeof content !== 'string' || content.trim().length < 10) {
       issues.push(`Section '${key}' is missing or too short`);
     }
   });

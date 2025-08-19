@@ -29,6 +29,10 @@ export class OpenAIEmbeddings implements EmbeddingProvider {
         input: text,
       });
 
+      if (!response.data || !response.data[0] || !response.data[0].embedding) {
+        throw new Error('Invalid response from OpenAI embeddings API');
+      }
+
       return response.data[0].embedding;
     } catch (error) {
       console.error('Error generating embedding:', error);
