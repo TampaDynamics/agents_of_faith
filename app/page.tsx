@@ -42,9 +42,6 @@ export default function HomePage() {
                 >
                   Start Asking Questions
                 </Link>
-                <button className="btn-outline text-lg px-8 py-4">
-                  Learn More
-                </button>
               </div>
             </div>
           </div>

@@ -18,6 +18,7 @@ export default function AskPage() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Load conversation from localStorage
   useEffect(() => {
@@ -50,6 +51,20 @@ export default function AskPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // iOS Safari: ensure input remains visible above keyboard
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const handleFocus = () => {
+      // Scroll the input into view on focus
+      setTimeout(() => {
+        el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }, 50);
+    };
+    el.addEventListener('focus', handleFocus);
+    return () => el.removeEventListener('focus', handleFocus);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,8 +258,8 @@ export default function AskPage() {
       </header>
 
       {/* Main Chat Area */}
-      <main className="flex-1 flex flex-col h-[calc(100vh-4rem)]">
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 flex flex-col h-[calc(100dvh-4rem)] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 pb-[calc(7rem+env(safe-area-inset-bottom))]">
           <div className="max-w-4xl mx-auto">
             {messages.length === 0 && (
               <div className="text-center py-12">
@@ -336,9 +351,9 @@ export default function AskPage() {
         </div>
 
         {/* Input Form */}
-        <div className="border-t border-gray-200 bg-white px-4 sm:px-6 lg:px-8 py-4">
+        <div className="sticky bottom-0 z-10 border-t border-gray-200 bg-white px-4 sm:px-6 lg:px-8 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <div className="max-w-4xl mx-auto">
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
               <div className="flex space-x-3">
                 <div className="flex-1 relative">
                   <textarea
@@ -347,10 +362,20 @@ export default function AskPage() {
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Ask your theological question here..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-colors"
-                    rows={1}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-colors will-change-[height]"
+                    rows={2}
                     disabled={isLoading}
-                    style={{ minHeight: '48px', maxHeight: '120px' }}
+                    style={{ minHeight: '48px', maxHeight: '160px' }}
+                    onInput={(e) => {
+                      const t = e.currentTarget;
+                      t.style.height = 'auto';
+                      const next = Math.min(t.scrollHeight, 160);
+                      t.style.height = next + 'px';
+                    }}
+                    enterKeyHint="send"
+                    autoCapitalize="sentences"
+                    autoCorrect="on"
+                    inputMode="text"
                   />
                 </div>
                 <button
