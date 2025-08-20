@@ -16,29 +16,27 @@ export default function AskPage() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showExportSuccess, setShowExportSuccess] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load conversation from localStorage on component mount
+  // Load conversation from localStorage
   useEffect(() => {
-    const savedConversation = localStorage.getItem('agents-of-faith-conversation');
-    if (savedConversation) {
+    const saved = localStorage.getItem('agents-of-faith-conversation');
+    if (saved) {
       try {
-        const parsed = JSON.parse(savedConversation);
-        // Convert timestamp strings back to Date objects
-        const messagesWithDates = parsed.map((msg: any) => ({
+        const parsed = JSON.parse(saved);
+        setMessages(parsed.map((msg: any) => ({
           ...msg,
           timestamp: new Date(msg.timestamp)
-        }));
-        setMessages(messagesWithDates);
+        })));
       } catch (error) {
-        console.error('Error loading conversation:', error);
-        localStorage.removeItem('agents-of-faith-conversation');
+        console.error('Failed to parse saved conversation:', error);
       }
     }
   }, []);
 
-  // Save conversation to localStorage whenever messages change
+  // Save conversation to localStorage
   useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem('agents-of-faith-conversation', JSON.stringify(messages));
@@ -46,8 +44,6 @@ export default function AskPage() {
       localStorage.setItem('agents-of-faith-last-saved', new Date().toISOString());
     }
   }, [messages]);
-
-
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -125,66 +121,6 @@ export default function AskPage() {
       localStorage.removeItem('agents-of-faith-conversation');
     }
   }, [messages]);
-
-
-
-  const getConversationDuration = () => {
-    if (messages.length < 2) return null;
-    const start = messages[0]?.timestamp;
-    const end = messages[messages.length - 1]?.timestamp;
-    if (!start || !end) return null;
-    const duration = end.getTime() - start.getTime();
-    const minutes = Math.floor(duration / (1000 * 60));
-    const hours = Math.floor(minutes / 60);
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes % 60}m`;
-    }
-    return `${minutes}m`;
-  };
-
-  const getLastActivity = () => {
-    if (messages.length === 0) return null;
-    const lastMessage = messages[messages.length - 1];
-    if (!lastMessage) return null;
-    const now = new Date();
-    const diff = now.getTime() - lastMessage.timestamp.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    
-    if (days > 0) return `${days} day${days !== 1 ? 's' : ''} ago`;
-    if (hours > 0) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-    if (minutes > 0) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-    return 'Just now';
-  };
-
-  const getConversationStats = () => {
-    const userMessages = messages.filter(m => m.role === 'user').length;
-    const assistantMessages = messages.filter(m => m.role === 'assistant').length;
-    const totalWords = messages.reduce((sum, m) => sum + m.content.split(' ').length, 0);
-    
-    return {
-      userMessages,
-      assistantMessages,
-      totalWords,
-      averageWordsPerMessage: totalWords / messages.length || 0
-    };
-  };
-
-  const getStorageSize = () => {
-    try {
-      const conversation = localStorage.getItem('agents-of-faith-conversation');
-      if (conversation) {
-        const sizeInBytes = new Blob([conversation]).size;
-        const sizeInKB = (sizeInBytes / 1024).toFixed(1);
-        return `${sizeInKB} KB`;
-      }
-      return '0 KB';
-    } catch {
-      return 'Unknown';
-    }
-  };
 
   const getConversationTitle = useCallback(() => {
     if (messages.length === 0) return '';
@@ -283,39 +219,6 @@ export default function AskPage() {
           </div>
           {messages.length > 0 && (
             <div className={styles.headerActions}>
-              <div className={styles.conversationInfo}>
-                <span className={styles.messageCount}>
-                  {messages.length} message{messages.length !== 1 ? 's' : ''}
-                </span>
-                <span className={styles.conversationDate}>
-                  Started {messages[0]?.timestamp.toLocaleDateString()} at {messages[0]?.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-                {getConversationDuration() && (
-                  <span className={styles.conversationDuration}>
-                    Duration: {getConversationDuration()}
-                  </span>
-                )}
-                <span className={styles.lastActivity}>
-                  Last: {getLastActivity()}
-                </span>
-                <div className={styles.conversationStats}>
-                  <span className={styles.statItem}>
-                    You: {getConversationStats().userMessages}
-                  </span>
-                  <span className={styles.statItem}>
-                    AI: {getConversationStats().assistantMessages}
-                  </span>
-                  <span className={styles.statItem}>
-                    Words: {getConversationStats().totalWords.toLocaleString()}
-                  </span>
-                  <span className={styles.saveIndicator}>
-                    💾 Auto-saved
-                  </span>
-                  <span className={styles.storageSize}>
-                    Size: {getStorageSize()}
-                  </span>
-                </div>
-              </div>
               <button
                 onClick={exportConversation}
                 className={styles.exportButton}
