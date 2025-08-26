@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { event } from '@/lib/gtag';
 
 interface Message {
   id: string;
@@ -80,6 +81,13 @@ export default function AskPage() {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
+
+    // Track question submission
+    event({
+      action: 'submit_question',
+      category: 'engagement',
+      label: 'theological_question',
+    });
 
     try {
       const response = await fetch('/api/ask', {
@@ -164,6 +172,14 @@ export default function AskPage() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    
+    // Track export action
+    event({
+      action: 'export_conversation',
+      category: 'engagement',
+      label: 'conversation_export',
+      value: messages.length,
+    });
     
     setShowExportSuccess(true);
     setTimeout(() => setShowExportSuccess(false), 3000);

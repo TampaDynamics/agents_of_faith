@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { event } from '@/lib/gtag';
 
 export default function HomePage() {
   return (
@@ -39,6 +42,11 @@ export default function HomePage() {
                 <Link 
                   href="/ask" 
                   className="btn-primary text-lg px-8 py-4 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                  onClick={() => event({
+                    action: 'click_cta',
+                    category: 'navigation',
+                    label: 'hero_start_asking',
+                  })}
                 >
                   Start Asking Questions
                 </Link>
@@ -136,6 +144,11 @@ export default function HomePage() {
               <Link 
                 href="/ask" 
                 className="inline-block bg-white text-blue-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors duration-200 shadow-lg"
+                onClick={() => event({
+                  action: 'click_cta',
+                  category: 'navigation',
+                  label: 'cta_begin_now',
+                })}
               >
                 Begin Now
               </Link>
